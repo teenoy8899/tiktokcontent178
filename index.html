@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Content Creator - ขายของแบบไม่ขาย</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+        .sidebar {
+            width: 25%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            width: 75%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            margin-bottom: 15px;
+            color: #fe2c55;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #fe2c55;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: background-color 0.3s;
+        }
+        .button:hover { background-color: #e02448; }
+        select, textarea, input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        .preview {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        #trending-data, #hashtags-data {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .search-bar { margin-bottom: 15px; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .sidebar, .main-content { width: 100%; }
+            .button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>เมนู</h2>
+            <button class="button" onclick="showSection('create')">สร้างคอนเทนต์</button>
+            <button class="button" onclick="showSection('hashtags')">Hashtags ยอดนิยม</button>
+            <button class="button" onclick="fetchRealTimeData()">ดึงข้อมูลเรียลไทม์</button>
+            <div id="trending-data"></div>
+            <div id="hashtags-data"></div>
+        </div>
+
+        <div class="main-content">
+            <h1>สร้างคอนเทนต์ TikTok - ขายของแบบไม่ขาย</h1>
+
+            <!-- Create Section -->
+            <div id="create-section">
+                <h3>เลือกหมวดหมู่สินค้า</h3>
+                <select id="category" onchange="updateScriptExample()">
+                    <option value="technology">เทคโนโลยี</option>
+                    <option value="beauty">ความงาม</option>
+                    <option value="food">อาหาร</option>
+                    <option value="health">สุขภาพ</option>
+                    <option value="fashion">แฟชั่น</option>
+                    <option value="travel">ท่องเที่ยว</option>
+                    <option value="education">การศึกษา</option>
+                    <option value="entertainment">บันเทิง</option>
+                    <option value="lifestyle">ไลฟ์สไตล์</option>
+                    <option value="gaming">เกมมิ่ง</option>
+                    <option value="sports">กีฬา</option>
+                    <option value="diy">DIY</option>
+                    <option value="pets">สัตว์เลี้ยง</option>
+                    <option value="home">บ้านและสวน</option>
+                    <option value="automotive">ยานยนต์</option>
+                </select>
+
+                <h3>ค้นหาคอนเทนต์ตามหมวดหมู่</h3>
+                <input type="text" id="content-search" class="search-bar" placeholder="พิมพ์หมวดหมู่เพื่อค้นหา..." onkeyup="searchContent()">
+
+                <h3>เลือกความยาววิดีโอ</h3>
+                <select id="video-length" onchange="adjustScriptLength()">
+                    <option value="20">20 วินาที</option>
+                    <option value="30">30 วินาที</option>
+                    <option value="60">60 วินาที</option>
+                </select>
+
+                <h3>เลือกประเภท Hook</h3>
+                <select id="hook-type" onchange="updateScriptExample()">
+                    <option value="problem">Problem Hook (ปัญหา)</option>
+                    <option value="curiosity">Curiosity Hook (สงสัย)</option>
+                    <option value="shock">Shock Hook (ตกใจ)</option>
+                    <option value="story">Story Hook (เล่าเรื่อง)</option>
+                    <option value="challenge">Challenge Hook (ท้าทาย)</option>
+                </select>
+
+                <h3>ปรับแต่งบทพูด</h3>
+                <textarea id="script" rows="5" placeholder="บทพูดจะแสดงที่นี่..."></textarea>
+                <button class="button" onclick="addFillerWords()">เพิ่มคำฟิลเลอร์</button>
+                <button class="button" onclick="generateNewScript()">สร้างบทพูดใหม่</button>
+
+                <h3>เลือก Call to Action (CTA)</h3>
+                <select id="cta" onchange="addCTA()">
+                    <option value="check-now">เช็คราคาตอนนี้เลย!</option>
+                    <option value="dm-me">ทักมาถามเลย ไม่咬!</option>
+                    <option value="save-this">เซฟคลิปนี้ไว้ ใช้แน่!</option>
+                    <option value="share-friends">แชร์ให้เพื่อนดูด้วยนะ!</option>
+                    <option value="join-fun">ลองทำตามแล้วแท็กมา!</option>
+                    <option value="limited-offer">ของมีจำกัด รีบเลย!</option>
+                    <option value="see-more">ดูเพิ่มเติมในหน้าโปรไฟล์!</option>
+                    <option value="try-now">ลองใช้ดู ดีจริง!</option>
+                    <option value="comment-below">คอมเมนต์บอกหน่อย ใช้ยังไง?</option>
+                    <option value="grab-deal">คว้าดีลนี้ก่อนหมด!</option>
+                </select>
+                <button class="button" onclick="addCTA()">เพิ่ม CTA</button>
+
+                <div class="preview">
+                    <h3>ตัวอย่างคอนเทนต์</h3>
+                    <p id="preview-text">ตัวอย่างจะแสดงที่นี่...</p>
+                    <button class="button" onclick="updatePreview()">ดูตัวอย่าง</button>
+                </div>
+
+                <button class="button" onclick="postToTikTok()">โพสต์ทันที</button>
+                <button class="button" onclick="saveProject()">บันทึกเป็นโครงการ</button>
+            </div>
+
+            <!-- Hashtags Section -->
+            <div id="hashtags-section" style="display: none;">
+                <h2>Hashtags ยอดนิยม</h2>
+                <select id="hashtag-category" onchange="fetchHashtags()">
+                    <option value="all">ทุกหมวดหมู่</option>
+                    <option value="technology">เทคโนโลยี</option>
+                    <option value="beauty">ความงาม</option>
+                    <option value="food">อาหาร</option>
+                    <option value="health">สุขภาพ</option>
+                    <option value="fashion">แฟชั่น</option>
+                </select>
+                <div id="hashtags-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TIKTOK_API_KEY = 'awr7n9777yirxtlj';
+        const TIKTOK_API_SECRET = 'rHfPfh0hpoEnDt8G914lRa08k0UF6xPw';
+        const fillers = ['คือว่า', 'อะไรแบบ', 'เหมือนแบบ', 'เอ่อ', 'นี่ไง', 'แบบว่า', 'อ่ะ', 'เนาะ'];
+        const scriptTemplates = {
+            technology: {
+                problem: 'เฮ้ย! เคยรู้สึกไหมว่าโทรศัพท์ช้าจนอยากโยนทิ้ง?',
+                curiosity: 'รู้ป่ะว่าทำไมคนถึงเปลี่ยน gadget ทุกปี?',
+                shock: 'เชื่อไหมว่าเครื่องนี้เร็วกว่าเดิม 10 เท่า!',
+                story: 'เมื่อวานเพื่อนผมลองใช้แท็บเล็ตใหม่ แล้วมันเปลี่ยนชีวิตเขาเลย...',
+                challenge: 'ลองใช้เมาส์ตัวนี้ 1 วัน แล้วบอกผมหน่อยว่าเป็นไง?'
+            },
+            beauty: {
+                problem: 'หน้าแห้งจนแต่งหน้าไม่ติด แก้ยังไงดีเนี่ย?',
+                curiosity: 'อยากรู้ไหมว่าทำไมผิวบางคนเด้งทั้งวัน?',
+                shock: 'ลิปตัวนี้ทาแล้วปากฉ่ำ 12 ชั่วโมง!',
+                story: 'ตอนแรกผมไม่เชื่อ จนได้ลองครีมนี้เอง...',
+                challenge: 'ลองทาลิปสีนี้ แล้วแท็กผม来看หน่อย!'
+            },
+            food: {
+                problem: 'หิวบ่อยแต่ไม่มีอะไรกิน แก้ยังไงดี?',
+                curiosity: 'รู้ป่ะว่าทำไมขนมนี้ถึงกรอบนาน?',
+                shock: 'กินอันนี้แล้วหยุดไม่ได้จริงๆ!',
+                story: 'เมื่อวานไปเจอร้านลับ อร่อยจนต้องซื้อกลับบ้าน...',
+                challenge: 'ลองทำเมนูนี้สิ แล้วบอกผมว่าอร่อยป่ะ?'
+            }
+        };
+
+        setInterval(fetchRealTimeData, 60000); // อัปเดตข้อมูลทุก 1 นาที
+
+        function showSection(section) {
+            document.getElementById('create-section').style.display = section === 'create' ? 'block' : 'none';
+            document.getElementById('hashtags-section').style.display = section === 'hashtags' ? 'block' : 'none';
+        }
+
+        function updateScriptExample() {
+            const category = document.getElementById('category').value;
+            const hook = document.getElementById('hook-type').value;
+            const script = scriptTemplates[category]?.[hook] || 'ยังไม่มีบทพูดสำหรับหมวดนี้';
+            document.getElementById('script').value = script;
+            updatePreview();
+        }
+
+        function generateNewScript() {
+            const category = document.getElementById('category').value;
+            const hook = document.getElementById('hook-type').value;
+            let newScript = '';
+            switch(hook) {
+                case 'problem':
+                    newScript = `เฮ้ย! เคยเจอปัญหาแบบนี้ป่ะ ${category === 'beauty' ? 'ผิวแห้งจนน่ากลัว' : 'ของใช้แล้วช้าเว่อร์'}?`;
+                    break;
+                case 'curiosity':
+                    newScript = `อยากรู้ป่ะว่าทำไม ${category === 'food' ? 'ของกินอันนี้ถึงอร่อย' : 'คนถึงชอบใช้ตัวนี้'}?`;
+                    break;
+                case 'shock':
+                    newScript = `เชื่อไหมว่า ${category === 'technology' ? 'เครื่องนี้เร็วกว่าเดิม 10 เท่า' : 'อันนี้เปลี่ยนชีวิตคุณได้'}!`;
+                    break;
+                case 'story':
+                    newScript = `เมื่อวานผมไปเจอ ${category === 'travel' ? 'ที่เที่ยวลับ' : 'ของดี'} มา แล้วมันสุดยอดมาก...`;
+                    break;
+                case 'challenge':
+                    newScript = `ลองใช้ ${category === 'health' ? 'ตัวนี้ 7 วัน' : 'อันนี้ดู'} แล้วบอกผมหน่อยว่าเป็นไง?`;
+                    break;
+            }
+            document.getElementById('script').value = newScript;
+            updatePreview();
+        }
+
+        function adjustScriptLength() {
+            const length = document.getElementById('video-length').value;
+            let script = document.getElementById('script').value;
+            if (length === '20') script = script.substring(0, 50);
+            else if (length === '30') script = script.substring(0, 100);
+            else if (length === '60') script = script;
+            document.getElementById('script').value = script;
+            updatePreview();
+        }
+
+        function addFillerWords() {
+            const randomFiller = fillers[Math.floor(Math.random() * fillers.length)];
+            let script = document.getElementById('script').value;
+            script += ` ${randomFiller}...`;
+            document.getElementById('script').value = script;
+            updatePreview();
+        }
+
+        function addCTA() {
+            const cta = document.getElementById('cta').value;
+            let script = document.getElementById('script').value;
+            const ctaText = {
+                'check-now': 'เช็คราคาตอนนี้เลย!',
+                'dm-me': 'ทักมาถามเลย ไม่咬!',
+                'save-this': 'เซฟคลิปนี้ไว้ ใช้แน่!',
+                'share-friends': 'แชร์ให้เพื่อนดูด้วยนะ!',
+                'join-fun': 'ลองทำตามแล้วแท็กมา!',
+                'limited-offer': 'ของมีจำกัด รีบเลย!',
+                'see-more': 'ดูเพิ่มเติมในหน้าโปรไฟล์!',
+                'try-now': 'ลองใช้ดู ดีจริง!',
+                'comment-below': 'คอมเมนต์บอกหน่อย ใช้ยังไง?',
+                'grab-deal': 'คว้าดีลนี้ก่อนหมด!'
+            };
+            script += ` ${ctaText[cta]}`;
+            document.getElementById('script').value = script;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const script = document.getElementById('script').value;
+            document.getElementById('preview-text').innerText = script;
+        }
+
+        async function fetchRealTimeData() {
+            const trendingData = document.getElementById('trending-data');
+            trendingData.innerHTML = 'กำลังดึงข้อมูลเรียลไทม์จาก TikTok...';
+            try {
+                const response = await fetch('https://open.tiktokapis.com/v2/research/trends/', {
+                    headers: {
+                        'Authorization': `Bearer ${TIKTOK_API_KEY}`,
+                        'Client-Secret': TIKTOK_API_SECRET
+                    }
+                });
+                const data = await response.json();
+                trendingData.innerHTML = `#ยอดนิยม: ${data.hashtags?.join(', ') || 'ไม่มีข้อมูล'}<br>อัปเดต: ${new Date().toLocaleTimeString()}`;
+            } catch (error) {
+                trendingData.innerHTML = 'เกิดข้อผิดพลาดในการดึงข้อมูล';
+            }
+        }
+
+        async function fetchHashtags() {
+            const category = document.getElementById('hashtag-category').value;
+            const hashtagsList = document.getElementById('hashtags-list');
+            hashtagsList.innerHTML = 'กำลังโหลด Hashtags...';
+            try {
+                const response = await fetch(`https://th-tik.ixspy.com/hashtags?category=${category}`);
+                const data = await response.json();
+                hashtagsList.innerHTML = `<strong>Hashtags ยอดนิยมใน ${category}:</strong><br>${data.hashtags?.join(', ') || 'ไม่มีข้อมูล'}`;
+            } catch (error) {
+                hashtagsList.innerHTML = 'เกิดข้อผิดพลาดในการดึง Hashtags';
+            }
+        }
+
+        function searchContent() {
+            const search = document.getElementById('content-search').value.toLowerCase();
+            const category = document.getElementById('category');
+            for (let option of category.options) {
+                if (option.value.toLowerCase().includes(search)) {
+                    category.value = option.value;
+                    updateScriptExample();
+                    break;
+                }
+            }
+        }
+
+        function postToTikTok() {
+            alert('โพสต์ไปยัง TikTok เรียบร้อยแล้ว (จำลอง)');
+        }
+
+        function saveProject() {
+            alert('บันทึกเป็นโครงการเรียบร้อยแล้ว');
+        }
+
+        showSection('create');
+        fetchRealTimeData();
+    </script>
+</body>
+</html>
